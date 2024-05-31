@@ -11,7 +11,7 @@ app.use(express.json());
 
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.ye8t7hu.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -44,14 +44,24 @@ async function run() {
 
     // card collections
 
-    app.get('/cards',async(req,res) =>{
-      const result = await cardsCollection.find().toArray();
+    app.get('/carts',async(req,res) =>{
+      const email =req.query.email;
+      const query ={email:email}
+      const result = await cardsCollection.find(query).toArray();
       res.send(result);
     })
-    app.post('/cards',async(req,res) =>{
+    app.post('/carts',async(req,res) =>{
       const cartItem =req.body;
       const result = await cardsCollection.insertOne(cartItem)
       res.send(result)
+    })
+
+    app.delete('/carts/:id',async (req , res) =>{
+      const id = req.params.id;
+      const query ={_id: new ObjectId(id)}
+      const result = await cardsCollection.deleteOne(query)
+      res.send(result);
+      
     })
 
 
